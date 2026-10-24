@@ -1,0 +1,30 @@
+name: kashafali
+description: Application de restauration et retouche photo.
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  image_picker: ^1.1.2
+  http: ^1.2.2
+  gal: ^2.3.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_launcher_icons: ^0.14.1
+
+# Génère les icônes Android : dart run flutter_launcher_icons
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/icon/icon.png"
+  adaptive_icon_background: "#6C4DFF"
+  adaptive_icon_foreground: "assets/icon/icon_foreground.png"
+
+flutter:
+  uses-material-design: true

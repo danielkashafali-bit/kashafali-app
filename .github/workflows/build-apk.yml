@@ -1,0 +1,56 @@
+name: Construire l'APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Créer le projet Android
+        run: |
+          flutter create --platforms=android --project-name kashafali --org com.kashafali .
+          git checkout -- lib/main.dart pubspec.yaml
+
+      - name: Nom de l'application et permission Internet
+        run: |
+          MANIFEST=android/app/src/main/AndroidManifest.xml
+          sed -i 's|android:label="[^"]*"|android:label="kashafali"|' "$MANIFEST"
+          sed -i 's|<application|<uses-permission android:name="android.permission.INTERNET"/>\n    <application|' "$MANIFEST"
+
+      - name: Générer les icônes
+        run: |
+          pip install pillow numpy
+          python tools/make_icons.py
+          flutter pub get
+          dart run flutter_launcher_icons
+
+      - name: Construire l'APK
+        run: flutter build apk --release
+
+      - name: Renommer l'APK
+        run: cp build/app/outputs/flutter-apk/app-release.apk kashafali.apk
+
+      - name: Publier l'APK dans les Releases
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          name: kashafali v1.0.${{ github.run_number }}
+          files: kashafali.apk
